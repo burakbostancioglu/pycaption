@@ -3,6 +3,7 @@ from ..geometry import (UnitEnum, Size, Layout, Point, Alignment,
                         VerticalAlignmentEnum, HorizontalAlignmentEnum)
 
 from .constants import PAC_BYTES_TO_POSITIONING_MAP, COMMANDS
+import collections
 
 
 class TimingCorrectingCaptionList(list):
@@ -91,7 +92,7 @@ class NotifyingDict(dict):
         :param key: any hashable object
         """
         if key not in self:
-            raise ValueError(u'No such key present')
+            raise ValueError('No such key present')
 
         # Notify observers of the change
         if key != self.active_key:
@@ -104,7 +105,7 @@ class NotifyingDict(dict):
         """Returns the value corresponding to the active key
         """
         if self.active_key is self._guard:
-            raise KeyError(u'No active key set')
+            raise KeyError('No active key set')
 
         return self[self.active_key]
 
@@ -117,8 +118,8 @@ class NotifyingDict(dict):
         :param observer: any callable that can be called with 2 positional
             arguments
         """
-        if not callable(observer):
-            raise TypeError(u'The observer should be callable')
+        if not isinstance(observer, collections.Callable):
+            raise TypeError('The observer should be callable')
 
         self.observers.append(observer)
 
@@ -201,7 +202,7 @@ class CaptionCreator(object):
             elif instruction.sets_italics_on():
                 caption.nodes.append(
                     CaptionNode.create_style(
-                        True, {u'italics': True},
+                        True, {'italics': True},
                         layout_info=_get_layout_from_tuple(
                             instruction.position
                         ))
@@ -211,7 +212,7 @@ class CaptionCreator(object):
             elif instruction.sets_italics_off():
                 caption.nodes.append(
                     CaptionNode.create_style(
-                        False, {u'italics': True},
+                        False, {'italics': True},
                         layout_info=_get_layout_from_tuple(
                             instruction.position)
                     ))
@@ -309,10 +310,10 @@ class InstructionNodeCreator(object):
         """
         self._update_positioning(command)
 
-        text = COMMANDS.get(command, u'')
+        text = COMMANDS.get(command, '')
 
-        if u'italic' in text:
-            if u'end' not in text:
+        if 'italic' in text:
+            if 'end' not in text:
                 self._collection.append(
                     _InstructionNode.create_italics_style(
                         self._position_tracer.get_current_position())
@@ -369,7 +370,7 @@ class InstructionNodeCreator(object):
             # use space to separate the stashes, but don't add final space
             if idx < len(stash_list) - 1:
                 try:
-                    instance._collection[-1].add_chars(u' ')
+                    instance._collection[-1].add_chars(' ')
                 except AttributeError:
                     pass
 
@@ -430,9 +431,9 @@ class _InstructionNode(object):
         :return:
         """
         if self.text is None:
-            self.text = u''
+            self.text = ''
 
-        self.text += u''.join(args)
+        self.text += ''.join(args)
 
     def is_text_node(self):
         """
@@ -483,7 +484,7 @@ class _InstructionNode(object):
     def get_text(self):
         """A little legacy code.
         """
-        return u' '.join(self.text.split())
+        return ' '.join(self.text.split())
 
     @classmethod
     def create_break(cls, position):
@@ -508,7 +509,7 @@ class _InstructionNode(object):
 
         :rtype: _InstructionNode
         """
-        return cls(u''.join(chars), position=position)
+        return cls(''.join(chars), position=position)
 
     @classmethod
     def create_italics_style(cls, position, turn_on=True):
@@ -538,17 +539,17 @@ class _InstructionNode(object):
 
     def __repr__(self):         # pragma: no cover
         if self._type == self.BREAK:
-            extra = u'BR'
+            extra = 'BR'
         elif self._type == self.TEXT:
-            extra = u'"{}"'.format(self.text)
+            extra = '"{}"'.format(self.text)
         elif self._type in (self.ITALICS_ON, self.ITALICS_OFF):
-            extra = u'italics {}'.format(
-                u'on' if self._type == self.ITALICS_ON else u'off'
+            extra = 'italics {}'.format(
+                'on' if self._type == self.ITALICS_ON else 'off'
             )
         else:
-            extra = u'change position'
+            extra = 'change position'
 
-        return u'<INode: {extra} >'.format(extra=extra)
+        return '<INode: {extra} >'.format(extra=extra)
 
 
 def _format_italics(collection):

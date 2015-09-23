@@ -2,14 +2,14 @@ from collections import defaultdict
 from datetime import timedelta
 
 
-DEFAULT_LANGUAGE_CODE = u'en-US'
+DEFAULT_LANGUAGE_CODE = 'en-US'
 
 
 def force_byte_string(content):
     try:
-        return content.encode(u'UTF-8')
+        return content.encode('UTF-8')
     except UnicodeEncodeError:
-        raise RuntimeError(u'Invalid content encoding')
+        raise RuntimeError('Invalid content encoding')
     except UnicodeDecodeError:
         return content
 
@@ -21,14 +21,14 @@ class CaptionConverter(object):
     def read(self, content, caption_reader):
         try:
             self.captions = caption_reader.read(content)
-        except AttributeError, e:
+        except AttributeError as e:
             raise Exception(e)
         return self
 
     def write(self, caption_writer):
         try:
             return caption_writer.write(self.captions)
-        except AttributeError, e:
+        except AttributeError as e:
             raise Exception(e)
 
 
@@ -128,11 +128,11 @@ class CaptionNode(object):
         if t == CaptionNode.TEXT:
             return repr(self.content)
         elif t == CaptionNode.BREAK:
-            return repr(u'BREAK')
+            return repr('BREAK')
         elif t == CaptionNode.STYLE:
-            return repr(u'STYLE: %s %s' % (self.start, self.content))
+            return repr('STYLE: %s %s' % (self.start, self.content))
         else:
-            raise RuntimeError(u'Unknown node type: ' + unicode(t))
+            raise RuntimeError('Unknown node type: ' + str(t))
 
     @staticmethod
     def create_text(text, layout_info=None):
@@ -184,7 +184,7 @@ class Caption(object):
 
     def __repr__(self):
         return repr(
-            u'{start} --> {end}\n{text}'.format(
+            '{start} --> {end}\n{text}'.format(
                 start=self.format_start(),
                 end=self.format_end(),
                 text=self.get_text()
@@ -199,22 +199,22 @@ class Caption(object):
             if node.type_ == CaptionNode.TEXT:
                 return node.content
             if node.type_ == CaptionNode.BREAK:
-                return u'\n'
-            return u''
+                return '\n'
+            return ''
         text_nodes = [get_text_for_node(node) for node in self.nodes]
-        return u''.join(text_nodes).strip()
+        return ''.join(text_nodes).strip()
 
     def _format_timestamp(self, value, msec_separator=None):
         datetime_value = timedelta(milliseconds=(int(value / 1000)))
 
-        str_value = unicode(datetime_value)[:11]
+        str_value = str(datetime_value)[:11]
         if not datetime_value.microseconds:
-            str_value += u'.000'
+            str_value += '.000'
 
         if msec_separator is not None:
-            str_value = str_value.replace(u".", msec_separator)
+            str_value = str_value.replace(".", msec_separator)
 
-        return u'0' + str_value
+        return '0' + str_value
 
 
 class CaptionSet(object):
@@ -242,7 +242,7 @@ class CaptionSet(object):
         self._captions[lang] = captions
 
     def get_languages(self):
-        return self._captions.keys()
+        return list(self._captions.keys())
 
     def get_captions(self, lang):
         return self._captions.get(lang, [])
@@ -264,14 +264,14 @@ class CaptionSet(object):
         return self._styles.get(selector, [])
 
     def get_styles(self):
-        return self._styles.items()
+        return list(self._styles.items())
 
     def set_styles(self, styles):
         self._styles = styles
 
     def is_empty(self):
         return all(
-            [len(captions) == 0 for captions in self._captions.values()]
+            [len(captions) == 0 for captions in list(self._captions.values())]
         )
 
     def set_layout_info(self, lang, layout_info):
