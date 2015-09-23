@@ -7,7 +7,6 @@ README_PATH = os.path.join(
     'README.rst')
 
 dependencies = [
-    'beautifulsoup4>=4.2.1',
 ]
 
 setup(
